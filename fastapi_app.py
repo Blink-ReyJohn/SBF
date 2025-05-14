@@ -1,7 +1,7 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from pymongo import MongoClient
-from pydantic import BaseModel
-from typing import Optional
+from bson.objectid import ObjectId
+from fastapi.responses import JSONResponse
 
 # Initialize FastAPI
 app = FastAPI()
@@ -11,21 +11,21 @@ client = MongoClient("mongodb+srv://reyjohnandraje2002:ReyJohn17@concentrix.txv3
 db = client["SBF"]
 collection = db["user_information"]
 
-# Pydantic model (optional if expanding later)
-class UserResponse(BaseModel):
-    userID: str
-    exists: bool
-    first_name: Optional[str] = None
-    last_name: Optional[str] = None
-
-@app.get("/check_user/{user_id}", response_model=UserResponse)
+@app.get("/check_user/{user_id}")
 def check_user_id(user_id: str):
     user = collection.find_one({"userID": user_id})
+
     if user:
-        return {
+        user["_id"] = str(user["_id"])  # Convert ObjectId to string
+        return JSONResponse(content={
             "userID": user_id,
             "exists": True,
-            "first_name": user.get("first_name"),
-            "last_name": user.get("last_name")
-        }
-    return {"userID": user_id, "exists": False}
+            "user_data": user
+        })
+
+    return JSONResponse(content={
+        "userID": user_id,
+        "exists": False,
+        "user_data": None,
+        "message": "User not found"
+    })
