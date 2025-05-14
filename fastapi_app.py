@@ -7,7 +7,7 @@ from typing import Optional
 app = FastAPI()
 
 # Connect to MongoDB
-client = MongoClient("mongodb://localhost:27017/")
+client = MongoClient("mongodb+srv://reyjohnandraje2002:ReyJohn17@concentrix.txv3t.mongodb.net/?retryWrites=true&w=majority&appName=Concentrix")
 db = client["SBF"]
 collection = db["user_information"]
 
